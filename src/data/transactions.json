@@ -1,0 +1,29 @@
+[
+  {
+    "id": "t1",
+    "date": "2025-12-01T10:15:00.000Z",
+    "merchant": "Coffee Shop",
+    "category": "Food",
+    "amount": -35,
+    "accountId": "main",
+    "description": "Latte"
+  },
+  {
+    "id": "t2",
+    "date": "2025-12-02T14:20:00.000Z",
+    "merchant": "Grocery",
+    "category": "Food",
+    "amount": -65.0,
+    "accountId": "main",
+    "description": "Groceries"
+  },
+  {
+    "id": "t3",
+    "date": "2025-12-03T09:00:00.000Z",
+    "merchant": "Paycheck",
+    "category": "Income",
+    "amount": 1600.5,
+    "accountId": "main",
+    "description": "Salary"
+  }
+]

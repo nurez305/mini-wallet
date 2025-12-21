@@ -1,0 +1,14 @@
+[
+  {
+    "id": "main",
+    "name": "Main",
+    "balance": 3001.0,
+    "currency": "USD"
+  },
+  {
+    "id": "savings",
+    "name": "Savings",
+    "balance": 3000,
+    "currency": "USD"
+  }
+]
