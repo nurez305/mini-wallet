@@ -1,0 +1,36 @@
+/* Mobile-first responsive styles */
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  
+  .show-on-mobile {
+    display: block !important;
+  }
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Better touch targets on mobile */
+@media (max-width: 768px) {
+  button, 
+  [role="button"],
+  a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+}
+
+/* Improve scrolling on mobile */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
