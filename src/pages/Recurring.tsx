@@ -187,6 +187,22 @@ useEffect(() => {
   console.log('Latest transactions:', transactions.slice(0, 3));
 }, [accounts, transactions]);
 
+const handleDeleteRecurring = (rt: RecurringTransaction) => {
+  if (window.confirm(`Delete recurring transaction "${rt.merchant}"?\n\nThis will also delete any transactions created from it and update your balances.`)) {
+    console.log('Deleting recurring transaction:', rt);
+    
+    // Store current balance for comparison
+    const account = accounts.find(a => a.id === rt.accountId);
+    console.log('Account balance before delete:', account?.balance);
+    
+    // Delete the recurring transaction (which will also delete related transactions)
+    deleteRecurringTransaction(rt.id);
+    
+    // Show feedback
+    alert(`Recurring transaction "${rt.merchant}" deleted!\n\nYour account balance has been updated.`);
+  }
+};
+
   // Calculate stats
   const monthlyRecurringIncome = recurringTransactions
     .filter(rt => rt.isActive && rt.amount > 0)
@@ -612,7 +628,7 @@ useEffect(() => {
                       <Edit2 size={18} />
                     </button>
                     <button
-                      onClick={() => deleteRecurringTransaction(rt.id)}
+                      onClick={() => handleDeleteRecurring(rt)}
                       className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"
                     >
                       <Trash2 size={18} />

@@ -62,6 +62,7 @@ type Store = {
   budgets: Budget[];
   recurringTransactions: RecurringTransaction[];
   accountHistory: AccountHistory[];
+  deleteTransaction: (id: string) => void;
 
   // Core actions
   addTransaction: (tx: Transaction) => void;
@@ -237,26 +238,6 @@ export const useStore = create<Store>()(
           budgets: s.budgets.filter((budget) => budget.id !== id),
         })),
 
-      // calculateBudgetSpending: (budget) => {
-      //   const { transactions } = get();
-      //   // const now = dayjs();
-      //   const start = dayjs(budget.startDate);
-
-      //   const relevantTransactions = transactions.filter(t => {
-      //     const txDate = dayjs(t.date);
-      //     return (
-      //       t.category === budget.category &&
-      //       t.amount < 0 &&
-      //       txDate.isAfter(start) &&
-      //       (!budget.endDate || txDate.isBefore(dayjs(budget.endDate)))
-      //     );
-      //   });
-
-      //   return Math.abs(relevantTransactions.reduce((sum, t) => sum + t.amount, 0));
-      // },
-
-      // Recurring transactions
-
       // In your useStore.ts, update calculateBudgetSpending:
       calculateBudgetSpending: (budget) => {
         const { transactions } = get();
@@ -313,12 +294,111 @@ export const useStore = create<Store>()(
           ),
         })),
 
-      deleteRecurringTransaction: (id) =>
-        set((s) => ({
-          recurringTransactions: s.recurringTransactions.filter(
-            (rt) => rt.id !== id
-          ),
-        })),
+      deleteTransaction: (id: string) => {
+        set((state) => {
+          // Find the transaction to delete
+          const transaction = state.transactions.find((t) => t.id === id);
+          if (!transaction) return state;
+
+          console.log("Deleting transaction:", transaction);
+
+          // Update account balance (reverse the transaction)
+          const updatedAccounts = state.accounts.map((account) => {
+            if (account.id === transaction.accountId) {
+              // Subtract the transaction amount (if it was -200, subtracting -200 = +200)
+              const newBalance = account.balance - transaction.amount;
+              return {
+                ...account,
+                balance: parseFloat(newBalance.toFixed(2)),
+              };
+            }
+            return account;
+          });
+
+          // Remove the transaction
+          const updatedTransactions = state.transactions.filter(
+            (t) => t.id !== id
+          );
+
+          // Update account history with new balance
+          const updatedHistory = [...state.accountHistory];
+          const account = updatedAccounts.find(
+            (a) => a.id === transaction.accountId
+          );
+          if (account) {
+            updatedHistory.unshift({
+              date: new Date().toISOString(),
+              accountId: transaction.accountId,
+              balance: account.balance,
+            });
+          }
+
+          return {
+            transactions: updatedTransactions,
+            accounts: updatedAccounts,
+            accountHistory: updatedHistory,
+          };
+        });
+      },
+
+      // In your useStore.ts, update the deleteRecurringTransaction function:
+deleteRecurringTransaction: (id: string) => {
+  set((state) => {
+    // First, find the recurring transaction being deleted
+    const recurringToDelete = state.recurringTransactions.find(rt => rt.id === id);
+    if (!recurringToDelete) return state;
+    
+    console.log('Deleting recurring transaction:', recurringToDelete);
+    
+    // Find all transactions that were created by this recurring transaction
+    const transactionsFromThisRecurring = state.transactions.filter(
+      t => t.recurringId === id || (t.isRecurring && t.merchant === recurringToDelete.merchant)
+    );
+    
+    console.log('Found transactions to delete:', transactionsFromThisRecurring.length);
+    
+    const updatedAccounts = [...state.accounts];
+    let updatedTransactions = [...state.transactions];
+    const updatedHistory = [...state.accountHistory];
+    
+    // For each transaction created by this recurring, reverse it
+    transactionsFromThisRecurring.forEach(tx => {
+      // Reverse the account balance
+      const accountIndex = updatedAccounts.findIndex(a => a.id === tx.accountId);
+      if (accountIndex !== -1) {
+        const oldBalance = updatedAccounts[accountIndex].balance;
+        const newBalance = oldBalance - tx.amount; // Subtract because we're reversing
+        
+        console.log(`Reversing transaction ${tx.id}: Account ${tx.accountId}: ${oldBalance} -> ${newBalance}`);
+        
+        updatedAccounts[accountIndex] = {
+          ...updatedAccounts[accountIndex],
+          balance: parseFloat(newBalance.toFixed(2))
+        };
+        
+        // Add new history entry
+        updatedHistory.unshift({
+          date: new Date().toISOString(),
+          accountId: tx.accountId,
+          balance: parseFloat(newBalance.toFixed(2))
+        });
+      }
+      
+      // Remove the transaction
+      updatedTransactions = updatedTransactions.filter(t => t.id !== tx.id);
+    });
+    
+    // Remove the recurring transaction template
+    const updatedRecurringTransactions = state.recurringTransactions.filter(rt => rt.id !== id);
+    
+    return {
+      transactions: updatedTransactions,
+      accounts: updatedAccounts,
+      recurringTransactions: updatedRecurringTransactions,
+      accountHistory: updatedHistory
+    };
+  });
+},
 
       processRecurringTransactions: () => {
         set((state) => {
