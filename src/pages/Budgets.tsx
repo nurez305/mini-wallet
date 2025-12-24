@@ -57,7 +57,7 @@ export default function Budgets() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Budget Management</h1>
+        <h1 className="text-md md:text-2xl font-bold text-gray-900 dark:text-white">Budget Management</h1>
         <button
           onClick={() => setShowForm(true)}
           className="bg-yellow-500 dark:bg-yellow-600 hover:bg-yellow-600 dark:hover:bg-yellow-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
