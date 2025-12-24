@@ -4,7 +4,7 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 
 function AccountRow({ acc }: { acc: Account }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border rounded-lg bg-white hover:shadow-sm transition-shadow">
+    <div className="flex items-center justify-between px-4 py-3 border rounded-lg bg-white dark:bg-gray-800 hover:shadow-sm transition-shadow dark:border-gray-700">
       <div className="flex items-center space-x-3">
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold"
@@ -13,13 +13,13 @@ function AccountRow({ acc }: { acc: Account }) {
           {acc.name.charAt(0)}
         </div>
         <div>
-          <div className="font-semibold">{acc.name}</div>
-          <div className="text-xs text-gray-500">{acc.currency ?? "USD"}</div>
+          <div className="font-semibold dark:text-white">{acc.name}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">{acc.currency ?? "USD"}</div>
         </div>
       </div>
       <div className="text-right">
-        <div className="text-sm text-gray-600">Balance</div>
-        <div className="text-lg font-bold">
+        <div className="text-sm text-gray-600 dark:text-gray-300">Balance</div>
+        <div className="text-lg font-bold dark:text-white">
           {(acc.balance).toLocaleString(undefined, { 
             style: "currency", 
             currency: acc.currency ?? "USD" 
@@ -40,10 +40,10 @@ export default function AccountPanel() {
 
   return (
     <aside className="space-y-4">
-      <div className="bg-white p-4 rounded-lg shadow">
+      <div className="bg-white dark:bg-gray-900 p-4 rounded-lg shadow dark:border dark:border-gray-800">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Accounts Overview</h2>
-          <div className={`flex items-center space-x-1 ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <h2 className="text-lg font-semibold dark:text-white">Accounts Overview</h2>
+          <div className={`flex items-center space-x-1 ${growth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {growth >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
             <span className="text-sm font-medium">
               {growth >= 0 ? '+' : ''}{growthPercentage.toFixed(1)}%
@@ -55,10 +55,10 @@ export default function AccountPanel() {
             <AccountRow key={a.id} acc={a} />
           ))}
         </div>
-        <div className="mt-4 pt-4 border-t">
+        <div className="mt-4 pt-4 border-t dark:border-gray-700">
           <div className="flex justify-between">
-            <span className="text-gray-600">Total Balance:</span>
-            <span className="font-bold text-lg">
+            <span className="text-gray-600 dark:text-gray-400">Total Balance:</span>
+            <span className="font-bold text-lg dark:text-white">
               ${totalBalance.toFixed(2)}
             </span>
           </div>

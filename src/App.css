@@ -9,9 +9,19 @@
   }
 }
 
-/* Smooth transitions */
+/* Smooth transitions for dark mode - ADD THIS SECTION */
 * {
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease-in-out, 
+              border-color 0.2s ease-in-out,
+              color 0.2s ease-in-out,
+              fill 0.2s ease-in-out;
+}
+
+/* Optional: Smooth theme switching for specific elements */
+.transition-colors {
+  transition: background-color 0.2s ease-in-out, 
+              border-color 0.2s ease-in-out,
+              color 0.2s ease-in-out;
 }
 
 /* Better touch targets on mobile */

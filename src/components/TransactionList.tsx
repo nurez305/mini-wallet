@@ -22,30 +22,43 @@ export default function TransactionList() {
   return (
     <div>
       <div className="flex gap-2 items-center mb-3">
-        <input className="border p-2 rounded w-60" placeholder="Search merchant" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select className="border p-2 rounded" value={category ?? ""} onChange={(e) => setCategory(e.target.value || null)}>
-          <option value="">All categories</option>
-          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+        <input 
+          className="border p-2 rounded w-60 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-400" 
+          placeholder="Search merchant" 
+          value={query} 
+          onChange={(e) => setQuery(e.target.value)} 
+        />
+        <select 
+          className="border p-2 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white" 
+          value={category ?? ""} 
+          onChange={(e) => setCategory(e.target.value || null)}
+        >
+          <option value="" className="dark:bg-gray-800 dark:text-white">All categories</option>
+          {categories.map(c => (
+            <option key={c} value={c} className="dark:bg-gray-800 dark:text-white">
+              {c}
+            </option>
+          ))}
         </select>
       </div>
 
-      <div className="bg-white rounded border">
+      <div className="bg-white dark:bg-gray-900 rounded border dark:border-gray-700">
         <table className="w-full">
-          <thead className="bg-gray-50 text-left">
+          <thead className="bg-gray-50 dark:bg-gray-800 text-left">
             <tr>
-              <th className="p-3 text-xs text-muted">Date</th>
-              <th className="p-3 text-xs text-muted">Merchant</th>
-              <th className="p-3 text-xs text-muted">Category</th>
-              <th className="p-3 text-xs text-muted text-right">Amount</th>
+              <th className="p-3 text-xs text-muted dark:text-gray-400">Date</th>
+              <th className="p-3 text-xs text-muted dark:text-gray-400">Merchant</th>
+              <th className="p-3 text-xs text-muted dark:text-gray-400">Category</th>
+              <th className="p-3 text-xs text-muted dark:text-gray-400 text-right">Amount</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((t: Transaction) => (
-              <tr key={t.id} className="border-t">
-                <td className="p-3 text-sm">{dayjs(t.date).format("DD/MM/YYYY")}</td>
-                <td className="p-3 text-sm">{t.merchant}</td>
-                <td className="p-3 text-sm">{t.category}</td>
-                <td className={`p-3 text-sm text-right ${t.amount < 0 ? "text-red-600" : "text-green-600"}`}>
+              <tr key={t.id} className="border-t dark:border-gray-700">
+                <td className="p-3 text-sm dark:text-gray-300">{dayjs(t.date).format("DD/MM/YYYY")}</td>
+                <td className="p-3 text-sm dark:text-gray-300">{t.merchant}</td>
+                <td className="p-3 text-sm dark:text-gray-300">{t.category}</td>
+                <td className={`p-3 text-sm text-right ${t.amount < 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
                   {t.amount < 0 ? "-" : "+"}${Math.abs(t.amount).toFixed(2)}
                 </td>
               </tr>

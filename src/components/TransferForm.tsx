@@ -35,32 +35,58 @@ export default function TransferForm() {
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg border">
-      <h3 className="text-lg font-semibold mb-3">Move Money</h3>
+    <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border dark:border-gray-700">
+      <h3 className="text-lg font-semibold mb-3 dark:text-white">Move Money</h3>
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-xs text-gray-600 mb-1">From</label>
-          <select className="w-full border rounded p-2" value={fromId} onChange={(e) => setFromId(e.target.value)}>
-            {accounts.map((acc) => <option key={acc.id} value={acc.id}>{acc.name} - {(acc.balance).toLocaleString()}</option>)}
+          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">From</label>
+          <select 
+            className="w-full border rounded p-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white" 
+            value={fromId} 
+            onChange={(e) => setFromId(e.target.value)}
+          >
+            {accounts.map((acc) => (
+              <option key={acc.id} value={acc.id} className="dark:bg-gray-800 dark:text-white">
+                {acc.name} - {(acc.balance).toLocaleString()}
+              </option>
+            ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-xs text-gray-600 mb-1">To</label>
-          <select className="w-full border rounded p-2" value={toId} onChange={(e) => setToId(e.target.value)}>
-            {accounts.map((acc) => <option key={acc.id} value={acc.id}>{acc.name} - {(acc.balance).toLocaleString()}</option>)}
+          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">To</label>
+          <select 
+            className="w-full border rounded p-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white" 
+            value={toId} 
+            onChange={(e) => setToId(e.target.value)}
+          >
+            {accounts.map((acc) => (
+              <option key={acc.id} value={acc.id} className="dark:bg-gray-800 dark:text-white">
+                {acc.name} - {(acc.balance).toLocaleString()}
+              </option>
+            ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-xs text-gray-600 mb-1">Amount</label>
-          <input className="w-full border rounded p-2" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" />
+          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Amount</label>
+          <input 
+            className="w-full border rounded p-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-400" 
+            inputMode="decimal" 
+            value={amount} 
+            onChange={(e) => setAmount(e.target.value)} 
+            placeholder="0.00" 
+          />
         </div>
 
-        {error && <div className="text-sm text-red-600">{error}</div>}
+        {error && <div className="text-sm text-red-600 dark:text-red-400">{error}</div>}
 
         <div>
-          <button type="submit" disabled={loading} className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-2 rounded font-semibold">
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full bg-yellow-400 dark:bg-yellow-500 hover:bg-yellow-500 dark:hover:bg-yellow-600 text-black dark:text-gray-900 py-2 rounded font-semibold"
+          >
             {loading ? "Sending..." : "Send"}
           </button>
         </div>
