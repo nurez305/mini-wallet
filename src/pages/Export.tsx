@@ -80,53 +80,53 @@ export default function Export() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Export Data</h1>
-          <p className="text-gray-600">Export your transaction data in various formats</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Export Data</h1>
+          <p className="text-gray-600 dark:text-gray-300">Export your transaction data in various formats</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Export Options */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-              <Filter size={20} />
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow dark:shadow-gray-700/30">
+            <h2 className="text-lg font-semibold mb-4 flex items-center space-x-2 dark:text-white">
+              <Filter size={20} className="dark:text-gray-300" />
               <span>Filter Options</span>
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Start Date
                 </label>
                 <input
                   type="date"
                   value={filters.startDate}
                   onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
+                  className="w-full border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   End Date
                 </label>
                 <input
                   type="date"
                   value={filters.endDate}
                   onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
+                  className="w-full border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Category
                 </label>
                 <select
                   value={filters.category}
                   onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
+                  className="w-full border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
                   <option value="">All Categories</option>
                   {categories.map(cat => (
@@ -136,13 +136,13 @@ export default function Export() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Account
                 </label>
                 <select
                   value={filters.accountId}
                   onChange={(e) => setFilters({ ...filters, accountId: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
+                  className="w-full border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
                   <option value="">All Accounts</option>
                   {accounts.map(acc => (
@@ -152,7 +152,7 @@ export default function Export() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Min Amount
                 </label>
                 <input
@@ -160,13 +160,13 @@ export default function Export() {
                   step="0.01"
                   value={filters.minAmount}
                   onChange={(e) => setFilters({ ...filters, minAmount: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
+                  className="w-full border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="0.00"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Max Amount
                 </label>
                 <input
@@ -174,48 +174,52 @@ export default function Export() {
                   step="0.01"
                   value={filters.maxAmount}
                   onChange={(e) => setFilters({ ...filters, maxAmount: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
+                  className="w-full border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="0.00"
                 />
               </div>
             </div>
             
-            <div className="mt-6 pt-6 border-t">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
+            <div className="mt-6 pt-6 border-t dark:border-gray-700">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Export Format
               </h3>
               <div className="flex space-x-4">
                 <button
                   onClick={() => setExportFormat('csv')}
-                  className={`flex-1 p-4 border rounded-lg flex flex-col items-center space-y-2 ${
-                    exportFormat === 'csv' ? 'border-yellow-500 bg-yellow-50' : ''
+                  className={`flex-1 p-4 border rounded-lg flex flex-col items-center space-y-2 transition-colors ${
+                    exportFormat === 'csv' 
+                      ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-600' 
+                      : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <FileText size={24} className="text-gray-600" />
-                  <span>CSV</span>
-                  <span className="text-xs text-gray-500">Excel, Sheets, Numbers</span>
+                  <FileText size={24} className="text-gray-600 dark:text-gray-300" />
+                  <span className="text-gray-900 dark:text-white">CSV</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Excel, Sheets, Numbers</span>
                 </button>
                 
                 <button
                   onClick={() => setExportFormat('json')}
-                  className={`flex-1 p-4 border rounded-lg flex flex-col items-center space-y-2 ${
-                    exportFormat === 'json' ? 'border-yellow-500 bg-yellow-50' : ''
+                  className={`flex-1 p-4 border rounded-lg flex flex-col items-center space-y-2 transition-colors ${
+                    exportFormat === 'json' 
+                      ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-600' 
+                      : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <FileJson size={24} className="text-gray-600" />
-                  <span>JSON</span>
-                  <span className="text-xs text-gray-500">APIs, Development</span>
+                  <FileJson size={24} className="text-gray-600 dark:text-gray-300" />
+                  <span className="text-gray-900 dark:text-white">JSON</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">APIs, Development</span>
                 </button>
               </div>
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold mb-4">Export Actions</h2>
-            <div className="flex space-x-4">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow dark:shadow-gray-700/30">
+            <h2 className="text-lg font-semibold mb-4 dark:text-white">Export Actions</h2>
+            <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleExport}
-                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-lg flex items-center justify-center space-x-2"
+                className="flex-1 bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white py-3 rounded-lg flex items-center justify-center space-x-2 transition-colors"
               >
                 <Download size={20} />
                 <span>Export All Data ({transactions.length} transactions)</span>
@@ -223,7 +227,7 @@ export default function Export() {
               
               <button
                 onClick={handleFilteredExport}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg flex items-center justify-center space-x-2"
+                className="flex-1 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white py-3 rounded-lg flex items-center justify-center space-x-2 transition-colors"
               >
                 <Filter size={20} />
                 <span>Export with Filters</span>
@@ -234,28 +238,28 @@ export default function Export() {
         
         {/* Preview */}
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold mb-4">Export Preview</h2>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow dark:shadow-gray-700/30">
+            <h2 className="text-lg font-semibold mb-4 dark:text-white">Export Preview</h2>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-600">Total Transactions:</span>
-                <span className="font-medium">{transactions.length}</span>
+                <span className="text-gray-600 dark:text-gray-300">Total Transactions:</span>
+                <span className="font-medium dark:text-white">{transactions.length}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Total Income:</span>
-                <span className="font-medium text-green-600">
+                <span className="text-gray-600 dark:text-gray-300">Total Income:</span>
+                <span className="font-medium text-green-600 dark:text-green-400">
                   ${transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Total Expenses:</span>
-                <span className="font-medium text-red-600">
+                <span className="text-gray-600 dark:text-gray-300">Total Expenses:</span>
+                <span className="font-medium text-red-600 dark:text-red-400">
                   ${Math.abs(transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0)).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Data Range:</span>
-                <span className="font-medium">
+                <span className="text-gray-600 dark:text-gray-300">Data Range:</span>
+                <span className="font-medium dark:text-white">
                   {transactions.length > 0 
                     ? `${dayjs(transactions[transactions.length - 1].date).format('MMM D, YYYY')} - ${dayjs(transactions[0].date).format('MMM D, YYYY')}`
                     : 'No data'
@@ -265,23 +269,23 @@ export default function Export() {
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold mb-4">Export Tips</h2>
-            <ul className="space-y-2 text-sm text-gray-600">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow dark:shadow-gray-700/30">
+            <h2 className="text-lg font-semibold mb-4 dark:text-white">Export Tips</h2>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <li className="flex items-start space-x-2">
-                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1"></div>
+                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1 shrink-0"></div>
                 <span>CSV files can be opened in Excel, Google Sheets, or Numbers</span>
               </li>
               <li className="flex items-start space-x-2">
-                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1"></div>
+                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1 shrink-0"></div>
                 <span>JSON files are useful for developers and APIs</span>
               </li>
               <li className="flex items-start space-x-2">
-                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1"></div>
+                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1 shrink-0"></div>
                 <span>Filter your data before export to reduce file size</span>
               </li>
               <li className="flex items-start space-x-2">
-                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1"></div>
+                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1 shrink-0"></div>
                 <span>Regular exports help with data backup and analysis</span>
               </li>
             </ul>
