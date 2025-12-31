@@ -61,7 +61,7 @@ export default function Dashboard() {
       <DashboardSummary />
 
       {/* Account-specific Stats */}
-      {stats.accountStats.length > 1 && (
+      {/* {stats.accountStats.length > 1 && (
         <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow dark:border dark:border-gray-800">
           <h2 className="text-lg font-semibold mb-4 dark:text-white">Account Breakdown</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -97,7 +97,7 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Quick Stats from Budgets and Recurring */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
