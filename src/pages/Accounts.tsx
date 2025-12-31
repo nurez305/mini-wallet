@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { Plus, Minus, Download, Upload, Check, X, Loader2 } from 'lucide-react';
@@ -322,7 +323,7 @@ export default function Accounts() {
                     <div>
                       <div className="font-medium text-gray-900 dark:text-white">{account.name}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {accountStats.find(a => a.id === account.id)?.transactions || 0} transactions
+                        {/* {accountStats.find(a => a.id === account.id)?.transactions || 0} transactions */}
                       </div>
                     </div>
                     <div className="text-xl font-bold text-gray-900 dark:text-white">

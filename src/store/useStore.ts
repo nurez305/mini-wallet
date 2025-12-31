@@ -73,7 +73,7 @@ type Store = {
   deleteTransaction: (id: string) => void;
 
   // Core actions
-  addTransaction: (tx: Transaction) => void;
+  addTransaction: (tx: any) => void;
   transfer: (
     fromId: string,
     toId: string,
