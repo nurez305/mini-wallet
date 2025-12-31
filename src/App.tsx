@@ -10,6 +10,7 @@ import Export from './pages/Export';
 import Header from './components/Header';
 import { Menu, X } from 'lucide-react';
 import Import from './pages/Import';
+import Accounts from './pages/Accounts';
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,6 +35,7 @@ function App() {
 
   const navigationItems = [
     { path: '/', label: 'Dashboard' },
+    { path: '/accounts', label: 'Accounts' },
     { path: '/reports', label: 'Reports' },
     { path: '/budgets', label: 'Budgets' },
     { path: '/recurring', label: 'Recurring' },
@@ -121,6 +123,7 @@ function App() {
         <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/accounts" element={<Accounts />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/budgets" element={<Budgets />} />
             <Route path="/recurring" element={<Recurring />} />

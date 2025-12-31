@@ -113,48 +113,67 @@ export default function Import() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Import Transactions</h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Import Transactions</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1">
             Import transactions to either Main or Savings account
           </p>
         </div>
       </div>
 
-      {/* Progress Steps */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-        <div className="flex items-center justify-between">
-          {['upload', 'map', 'preview', 'results'].map((step, index) => (
-            <div key={step} className="flex items-center">
-              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-                currentStep === step 
-                  ? 'bg-yellow-500 text-white' 
-                  : index < ['upload', 'map', 'preview', 'results'].indexOf(currentStep)
-                  ? 'bg-green-500 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-              }`}>
-                {index + 1}
+      {/* Progress Steps - Responsive Version */}
+      <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+          {['upload', 'map', 'preview', 'results'].map((step, index) => {
+            const stepIndex = ['upload', 'map', 'preview', 'results'].indexOf(currentStep);
+            const isActive = currentStep === step;
+            const isCompleted = index < stepIndex;
+            
+            return (
+              <div key={step} className="flex items-center w-full sm:w-auto">
+                {/* Step indicator */}
+                <div className="flex items-center">
+                  <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full ${
+                    isActive 
+                      ? 'bg-yellow-500 text-white' 
+                      : isCompleted
+                      ? 'bg-green-500 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  <div className="ml-2 sm:ml-3">
+                    <div className="text-xs sm:text-sm font-medium dark:text-white capitalize">
+                      {/* Show short labels on mobile, full on desktop */}
+                      <span className="sm:hidden">
+                        {step === 'upload' ? 'Upload' : 
+                         step === 'map' ? 'Map' : 
+                         step === 'preview' ? 'Preview' : 'Results'}
+                      </span>
+                      <span className="hidden sm:inline">{step}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Connecting line - hide on mobile after first 3 steps */}
+                {index < 3 && (
+                  <div className={`ml-3 mr-2 sm:mx-4 ${
+                    index < stepIndex
+                      ? 'bg-green-500'
+                      : 'bg-gray-200 dark:bg-gray-700'
+                  } flex-1 sm:flex-none sm:w-16 lg:w-24 h-1 rounded-full`} />
+                )}
               </div>
-              <div className="ml-2">
-                <div className="text-sm font-medium dark:text-white capitalize">{step}</div>
-              </div>
-              {index < 3 && (
-                <div className={`w-24 h-1 mx-4 ${
-                  index < ['upload', 'map', 'preview', 'results'].indexOf(currentStep)
-                    ? 'bg-green-500'
-                    : 'bg-gray-200 dark:bg-gray-700'
-                }`} />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Step Content */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow">
         {currentStep === 'upload' && (
           <div>
             <h2 className="text-lg font-semibold mb-4 dark:text-white">Upload Your File</h2>
@@ -191,15 +210,15 @@ export default function Import() {
       </div>
 
       {/* Help Section */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-4 dark:text-white">Import Tips</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div className="p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
             <div className="flex items-center mb-2">
-              <FileText className="text-blue-500 mr-2" size={20} />
-              <h3 className="font-medium dark:text-white">Required Columns</h3>
+              <FileText className="text-blue-500 mr-2 shrink-0" size={20} />
+              <h3 className="font-medium dark:text-white text-sm sm:text-base">Required Columns</h3>
             </div>
-            <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+            <ul className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 space-y-1">
               <li>• Date (YYYY-MM-DD)</li>
               <li>• Merchant/Description</li>
               <li>• Amount (negative for expenses)</li>
@@ -207,29 +226,29 @@ export default function Import() {
             </ul>
           </div>
           
-          <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div className="p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
             <div className="flex items-center mb-2">
-              <CheckCircle className="text-green-500 mr-2" size={20} />
-              <h3 className="font-medium dark:text-white">Account Selection</h3>
+              <CheckCircle className="text-green-500 mr-2 shrink-0" size={20} />
+              <h3 className="font-medium dark:text-white text-sm sm:text-base">Account Selection</h3>
             </div>
-            <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+            <ul className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 space-y-1">
               <li>• All imported transactions go to one account</li>
               <li>• Choose Main or Savings account</li>
               <li>• Account balance updates automatically</li>
             </ul>
           </div>
           
-          <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div className="p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
             <div className="flex items-center mb-2">
-              <Download className="text-purple-500 mr-2" size={20} />
-              <h3 className="font-medium dark:text-white">Sample Template</h3>
+              <Download className="text-purple-500 mr-2 shrink-0" size={20} />
+              <h3 className="font-medium dark:text-white text-sm sm:text-base">Sample Template</h3>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-2">
               Download our CSV template:
             </p>
             <button
               onClick={() => downloadSampleCSV()}
-              className="text-sm text-yellow-600 hover:text-yellow-700 dark:text-yellow-400"
+              className="text-xs sm:text-sm text-yellow-600 hover:text-yellow-700 dark:text-yellow-400 font-medium"
             >
               Download CSV Template
             </button>

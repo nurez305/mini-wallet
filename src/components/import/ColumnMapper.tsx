@@ -52,6 +52,7 @@ export default function ColumnMapper({
       
       return () => clearTimeout(timer);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [headers, initialMapping]); // Removed mapping from dependencies
 
   // Set default account if available
@@ -479,7 +480,7 @@ export default function ColumnMapper({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-between pt-4 border-t dark:border-gray-700">
+      <div className="flex gap-4 flex-col md:flex-row justify-between pt-4 border-t dark:border-gray-700">
         <button
           onClick={generateMappedData}
           className="flex items-center space-x-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium"

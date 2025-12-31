@@ -1,8 +1,5 @@
 import React from 'react';
-import TransferForm from '../components/TransferForm';
 import { useStore } from '../store/useStore';
-import AccountPanel from '../components/AccountsPanel';
-import TransactionsTable from '../components/TransactionsTable';
 import DashboardSummary from '../components/DashboardSummary';
 
 export default function Dashboard() {
@@ -153,21 +150,19 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column */}
+      {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           <AccountPanel />
           <TransferForm />
         </div>
         
-        {/* Right Column */}
         <div className="lg:col-span-2">
           <div className="bg-white dark:bg-gray-900 rounded-lg shadow dark:border dark:border-gray-800 p-4 sm:p-6">
             <h2 className="text-lg font-semibold mb-4 dark:text-white">Recent Transactions</h2>
             <TransactionsTable />
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
