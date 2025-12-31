@@ -1,22 +1,44 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useStore } from "../store/useStore";
 import { ChevronRight, Filter } from 'lucide-react';
+import { normalizeTransactionAmount } from "../utils";
 
-function Amount({ n }: { n: number }) {
-  const isCredit = n >= 0;
+function Amount({ n }: { n: any }) {
+  const num = typeof n === 'number' ? n : parseFloat(n);
+  if (isNaN(num)) {
+    return (
+      <span className="text-red-600 dark:text-red-400">
+        Invalid
+      </span>
+    );
+  }
+  
+  const isCredit = num >= 0;
   return (
     <span className={`${isCredit ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-      {(n >= 0 ? "+" : "") + n.toFixed(2)}
+      {(num >= 0 ? "+" : "") + num.toFixed(2)}
     </span>
   );
 }
 
-function Balance({ balance }: { balance: number }) {
-  const isPositive = balance >= 0;
+// Update the Balance component:
+function Balance({ balance }: { balance: any }) {
+  const num = typeof balance === 'number' ? balance : parseFloat(balance);
+  
+  if (isNaN(num)) {
+    return (
+      <span className="text-red-600 dark:text-red-400">
+        Invalid
+      </span>
+    );
+  }
+  
+  const isPositive = num >= 0;
   return (
     <span className={`${isPositive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-      {balance.toFixed(2)}
+      {num.toFixed(2)}
     </span>
   );
 }
@@ -33,53 +55,60 @@ export default function TransactionsTable() {
     return ["All", ...Array.from(setCat)];
   }, [transactions]);
 
-  const transactionsWithRunningBalance = useMemo(() => {
-    const accountBalances: Record<string, number> = {};
-    accounts.forEach(account => {
-      accountBalances[account.id] = account.balance;
-    });
+ const transactionsWithRunningBalance = useMemo(() => {
+  const accountBalances: Record<string, number> = {};
+  accounts.forEach(account => {
+    accountBalances[account.id] = account.balance;
+  });
 
-    const accountTransactionTotals: Record<string, number> = {};
-    transactions.forEach(transaction => {
-      accountTransactionTotals[transaction.accountId] = 
-        (accountTransactionTotals[transaction.accountId] || 0) + transaction.amount;
-    });
+  const accountTransactionTotals: Record<string, number> = {};
+  
+  // NORMALIZE AMOUNTS HERE
+  const normalizedTransactions = transactions.map(t => ({
+    ...t,
+    amount: normalizeTransactionAmount(t.amount)
+  }));
+  
+  normalizedTransactions.forEach(transaction => {
+    accountTransactionTotals[transaction.accountId] = 
+      (accountTransactionTotals[transaction.accountId] || 0) + transaction.amount;
+  });
 
-    const accountInitialBalances: Record<string, number> = {};
-    accounts.forEach(account => {
-      accountInitialBalances[account.id] = account.balance - (accountTransactionTotals[account.id] || 0);
-    });
+  const accountInitialBalances: Record<string, number> = {};
+  accounts.forEach(account => {
+    accountInitialBalances[account.id] = account.balance - (accountTransactionTotals[account.id] || 0);
+  });
 
-    const transactionsByAccount: Record<string, typeof transactions> = {};
+  const transactionsByAccount: Record<string, typeof normalizedTransactions> = {};
+  
+  normalizedTransactions.forEach(transaction => {
+    if (!transactionsByAccount[transaction.accountId]) {
+      transactionsByAccount[transaction.accountId] = [];
+    }
+    transactionsByAccount[transaction.accountId].push(transaction);
+  });
+  
+  const result: Array<typeof normalizedTransactions[0] & { runningBalance: number }> = [];
+  
+  Object.entries(transactionsByAccount).forEach(([accountId, accountTransactions]) => {
+    const sorted = [...accountTransactions].sort(
+      (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf()
+    );
     
-    transactions.forEach(transaction => {
-      if (!transactionsByAccount[transaction.accountId]) {
-        transactionsByAccount[transaction.accountId] = [];
-      }
-      transactionsByAccount[transaction.accountId].push(transaction);
-    });
+    let runningBalance = accountInitialBalances[accountId] || 0;
     
-    const result: Array<typeof transactions[0] & { runningBalance: number }> = [];
-    
-    Object.entries(transactionsByAccount).forEach(([accountId, accountTransactions]) => {
-      const sorted = [...accountTransactions].sort(
-        (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf()
-      );
-      
-      let runningBalance = accountInitialBalances[accountId] || 0;
-      
-      sorted.forEach(transaction => {
-        runningBalance += transaction.amount;
-        result.push({
-          ...transaction,
-          runningBalance,
-          accountId
-        });
+    sorted.forEach(transaction => {
+      runningBalance += transaction.amount;
+      result.push({
+        ...transaction,
+        runningBalance,
+        accountId
       });
     });
-    
-    return result;
-  }, [transactions, accounts]);
+  });
+  
+  return result;
+}, [transactions, accounts]);
 
   const filtered = useMemo(() => {
   return transactionsWithRunningBalance.filter((t) => {

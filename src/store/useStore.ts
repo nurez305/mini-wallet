@@ -1,9 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import dayjs from "dayjs";
 import { v4 as uuidv4 } from "uuid";
 import accountsData from "../data/accounts.json";
 import transactionsData from "../data/transactions.json";
+import { normalizeTransactionAmount } from "../utils";
+
+/* helper functions */
+const isValidDate = (dateString: string): boolean => {
+  const date = new Date(dateString);
+  return date instanceof Date && !isNaN(date.getTime());
+};
 
 /* types */
 export type Account = {
@@ -95,6 +103,12 @@ type Store = {
 
   // Export actions
   exportTransactions: (format: "csv" | "json") => string;
+  addTransactionsBulk: (transactions: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>[]) => void;
+   validateImportTransactions: (transactions: any[]) => {
+    valid: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>[];
+    invalid: Array<{ transaction: any; error: string }>;
+  };
+  
 
   // Filter actions
   filterTransactions: (options: {
@@ -106,6 +120,9 @@ type Store = {
     accountId?: string;
   }) => Transaction[];
 };
+
+
+
 
 export const useStore = create<Store>()(
   persist(
@@ -220,6 +237,102 @@ export const useStore = create<Store>()(
           accountHistory: [],
         })),
 
+      addTransactionsBulk: (transactions) => {
+  set((s) => {
+    // Create new transactions
+    const newTransactions: Transaction[] = transactions.map((t) => {
+      // Normalize amount to number
+      const normalizedAmount = normalizeTransactionAmount(t.amount);
+      
+      return {
+        id: uuidv4(),
+        date: t.date,
+        merchant: t.merchant,
+        amount: normalizedAmount,
+        category: t.category,
+        accountId: t.accountId,
+        description: t.description || '',
+      };
+    });
+
+    // Update account balances
+    const updatedAccounts = s.accounts.map((account) => {
+      // Find all transactions for this account in the new batch
+      const accountTransactions = newTransactions.filter(t => t.accountId === account.id);
+      if (accountTransactions.length === 0) return account;
+
+      // Calculate total change for this account
+      const totalChange = accountTransactions.reduce((sum, t) => sum + t.amount, 0);
+      
+      return {
+        ...account,
+        balance: +(account.balance + totalChange).toFixed(2),
+      };
+    });
+
+    // Add to history
+    const newHistory: AccountHistory[] = [];
+    updatedAccounts.forEach(account => {
+      const accountTransactions = newTransactions.filter(t => t.accountId === account.id);
+      if (accountTransactions.length > 0) {
+        newHistory.push({
+          date: dayjs().toISOString(),
+          accountId: account.id,
+          balance: account.balance,
+        });
+      }
+    });
+
+    return {
+      transactions: [...newTransactions, ...s.transactions],
+      accounts: updatedAccounts,
+      accountHistory: [...newHistory, ...s.accountHistory],
+    };
+  });
+},
+validateImportTransactions: (transactions) => {
+  const valid: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>[] = [];
+  const invalid: Array<{ transaction: any; error: string }> = [];
+
+  transactions.forEach((t) => {
+    const errors: string[] = [];
+
+    // Required field validation
+    if (!t.date) errors.push('Date is required');
+    if (!t.merchant || t.merchant.trim() === '') errors.push('Merchant is required');
+    if (t.amount === undefined || t.amount === null) errors.push('Amount is required');
+    if (!t.category || t.category.trim() === '') errors.push('Category is required');
+    
+    // Account validation - must be one of our two accounts
+    if (!t.accountId) {
+      errors.push('Account is required');
+    } else {
+      const validAccountIds = ['main', 'savings']; // CHANGED HERE
+      if (!validAccountIds.includes(t.accountId)) {
+        errors.push(`Invalid account. Must be either Main (ID: 'main') or Savings (ID: 'savings') account`);
+      }
+    }
+
+    // Type validation
+    if (t.date && !isValidDate(t.date)) errors.push('Invalid date format');
+    if (t.amount && typeof t.amount !== 'number') errors.push('Amount must be a number');
+
+    if (errors.length > 0) {
+      invalid.push({ transaction: t, error: errors.join(', ') });
+    } else {
+      valid.push({
+        date: t.date,
+        merchant: t.merchant,
+        amount: t.amount,
+        category: t.category,
+        accountId: t.accountId,
+        description: t.description || '',
+      });
+    }
+  });
+
+  return { valid, invalid };
+},
       // Budget methods
       addBudget: (budget) => {
         const budgetWithId = { ...budget, id: uuidv4(), spent: 0 };
@@ -342,63 +455,77 @@ export const useStore = create<Store>()(
       },
 
       // In your useStore.ts, update the deleteRecurringTransaction function:
-deleteRecurringTransaction: (id: string) => {
-  set((state) => {
-    // First, find the recurring transaction being deleted
-    const recurringToDelete = state.recurringTransactions.find(rt => rt.id === id);
-    if (!recurringToDelete) return state;
-    
-    console.log('Deleting recurring transaction:', recurringToDelete);
-    
-    // Find all transactions that were created by this recurring transaction
-    const transactionsFromThisRecurring = state.transactions.filter(
-      t => t.recurringId === id || (t.isRecurring && t.merchant === recurringToDelete.merchant)
-    );
-    
-    console.log('Found transactions to delete:', transactionsFromThisRecurring.length);
-    
-    const updatedAccounts = [...state.accounts];
-    let updatedTransactions = [...state.transactions];
-    const updatedHistory = [...state.accountHistory];
-    
-    // For each transaction created by this recurring, reverse it
-    transactionsFromThisRecurring.forEach(tx => {
-      // Reverse the account balance
-      const accountIndex = updatedAccounts.findIndex(a => a.id === tx.accountId);
-      if (accountIndex !== -1) {
-        const oldBalance = updatedAccounts[accountIndex].balance;
-        const newBalance = oldBalance - tx.amount; // Subtract because we're reversing
-        
-        console.log(`Reversing transaction ${tx.id}: Account ${tx.accountId}: ${oldBalance} -> ${newBalance}`);
-        
-        updatedAccounts[accountIndex] = {
-          ...updatedAccounts[accountIndex],
-          balance: parseFloat(newBalance.toFixed(2))
-        };
-        
-        // Add new history entry
-        updatedHistory.unshift({
-          date: new Date().toISOString(),
-          accountId: tx.accountId,
-          balance: parseFloat(newBalance.toFixed(2))
+      deleteRecurringTransaction: (id: string) => {
+        set((state) => {
+          // First, find the recurring transaction being deleted
+          const recurringToDelete = state.recurringTransactions.find(
+            (rt) => rt.id === id
+          );
+          if (!recurringToDelete) return state;
+
+          console.log("Deleting recurring transaction:", recurringToDelete);
+
+          // Find all transactions that were created by this recurring transaction
+          const transactionsFromThisRecurring = state.transactions.filter(
+            (t) =>
+              t.recurringId === id ||
+              (t.isRecurring && t.merchant === recurringToDelete.merchant)
+          );
+
+          console.log(
+            "Found transactions to delete:",
+            transactionsFromThisRecurring.length
+          );
+
+          const updatedAccounts = [...state.accounts];
+          let updatedTransactions = [...state.transactions];
+          const updatedHistory = [...state.accountHistory];
+
+          // For each transaction created by this recurring, reverse it
+          transactionsFromThisRecurring.forEach((tx) => {
+            // Reverse the account balance
+            const accountIndex = updatedAccounts.findIndex(
+              (a) => a.id === tx.accountId
+            );
+            if (accountIndex !== -1) {
+              const oldBalance = updatedAccounts[accountIndex].balance;
+              const newBalance = oldBalance - tx.amount; // Subtract because we're reversing
+
+              console.log(
+                `Reversing transaction ${tx.id}: Account ${tx.accountId}: ${oldBalance} -> ${newBalance}`
+              );
+
+              updatedAccounts[accountIndex] = {
+                ...updatedAccounts[accountIndex],
+                balance: parseFloat(newBalance.toFixed(2)),
+              };
+
+              // Add new history entry
+              updatedHistory.unshift({
+                date: new Date().toISOString(),
+                accountId: tx.accountId,
+                balance: parseFloat(newBalance.toFixed(2)),
+              });
+            }
+
+            // Remove the transaction
+            updatedTransactions = updatedTransactions.filter(
+              (t) => t.id !== tx.id
+            );
+          });
+
+          // Remove the recurring transaction template
+          const updatedRecurringTransactions =
+            state.recurringTransactions.filter((rt) => rt.id !== id);
+
+          return {
+            transactions: updatedTransactions,
+            accounts: updatedAccounts,
+            recurringTransactions: updatedRecurringTransactions,
+            accountHistory: updatedHistory,
+          };
         });
-      }
-      
-      // Remove the transaction
-      updatedTransactions = updatedTransactions.filter(t => t.id !== tx.id);
-    });
-    
-    // Remove the recurring transaction template
-    const updatedRecurringTransactions = state.recurringTransactions.filter(rt => rt.id !== id);
-    
-    return {
-      transactions: updatedTransactions,
-      accounts: updatedAccounts,
-      recurringTransactions: updatedRecurringTransactions,
-      accountHistory: updatedHistory
-    };
-  });
-},
+      },
 
       processRecurringTransactions: () => {
         set((state) => {

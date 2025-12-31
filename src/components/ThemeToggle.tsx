@@ -13,9 +13,6 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     const root = document.documentElement;
-    console.log('Theme useEffect - isDarkMode:', isDarkMode);
-    console.log('HTML classes before:', root.className);
-    
     if (isDarkMode) {
       root.classList.add('dark');
       localStorage.setItem('mini-wallet-theme', 'dark');
@@ -23,13 +20,9 @@ export default function ThemeToggle() {
       root.classList.remove('dark');
       localStorage.setItem('mini-wallet-theme', 'light');
     }
-    
-    console.log('HTML classes after:', root.className);
-    console.log('---');
   }, [isDarkMode]);
 
   const handleClick = () => {
-    console.log('Button clicked - current:', isDarkMode, 'new:', !isDarkMode);
     setIsDarkMode(!isDarkMode);
   };
 

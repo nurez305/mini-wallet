@@ -9,6 +9,7 @@ import History from './pages/History';
 import Export from './pages/Export';
 import Header from './components/Header';
 import { Menu, X } from 'lucide-react';
+import Import from './pages/Import';
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -38,6 +39,7 @@ function App() {
     { path: '/recurring', label: 'Recurring' },
     { path: '/history', label: 'History' },
     { path: '/export', label: 'Export' },
+    { path: '/import', label: 'Import' },
   ];
 
   return (
@@ -124,6 +126,7 @@ function App() {
             <Route path="/recurring" element={<Recurring />} />
             <Route path="/history" element={<History />} />
             <Route path="/export" element={<Export />} />
+            <Route path="/import" element={<Import />} />
           </Routes>
         </main>
       </div>
