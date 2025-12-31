@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useStore, RecurringTransaction } from '../store/useStore';
-import { Plus, Edit2, Trash2, Calendar, RefreshCw, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Calendar, RefreshCw, X, Check, Loader2 } from 'lucide-react';
 import dayjs from 'dayjs';
 
 export default function Recurring() {
@@ -16,7 +16,24 @@ export default function Recurring() {
   
   const [showForm, setShowForm] = useState(false);
   const [editingRecurring, setEditingRecurring] = useState<RecurringTransaction | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   
+  // Success modal states
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  
+  // Timeout reference
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clean up timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const [formData, setFormData] = useState({
     merchant: '',
     category: '',
@@ -49,6 +66,22 @@ export default function Recurring() {
     });
     
     return pending.length;
+  };
+
+  // Show success modal after delay
+  const showSuccessAfterDelay = (processedCount: number) => {
+    const message = processedCount === 1 
+      ? `Successfully processed ${processedCount} recurring transaction`
+      : `Successfully processed ${processedCount} recurring transactions`;
+    
+    setSuccessMessage(message);
+    
+    // Set timeout for 1 second before showing modal
+    timeoutRef.current = setTimeout(() => {
+      setShowSuccessModal(true);
+      setIsProcessing(false);
+      timeoutRef.current = null;
+    }, 1000);
   };
 
 // Replace the entire handleSubmit function:
@@ -158,25 +191,32 @@ const handleEdit = (rt: RecurringTransaction) => {
 
 // Replace handleProcessNow with this:
 const handleProcessNow = () => {
-  console.log('=== PROCESS NOW CLICKED ===');
-  
+  // Clear any pending timeouts
+  if (timeoutRef.current) {
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = null;
+  }
+
   // Get current state for comparison
   const mainAccountBefore = accounts.find(a => a.id === 'main');
   const savingsAccountBefore = accounts.find(a => a.id === 'savings');
   const transactionCountBefore = transactions.length;
+  const pendingCountBefore = getPendingCount();
   
   console.log('Before processing:');
+  console.log('- Pending transactions:', pendingCountBefore);
   console.log('- Main balance:', mainAccountBefore?.balance);
   console.log('- Savings balance:', savingsAccountBefore?.balance);
   console.log('- Transaction count:', transactionCountBefore);
   
+  // Start processing
+  setIsProcessing(true);
+  
   // Process transactions
   processRecurringTransactions();
   
-  // The state will update via React's re-render
-  // We'll see the changes in the next render cycle
-  
-  alert('Recurring transactions processed! Check:\n1. Your balances\n2. Transaction history\n3. Refresh the page if changes are not visible immediately.');
+  // Show success modal after 1 second
+  showSuccessAfterDelay(pendingCountBefore);
 };
 
 // Add this useEffect at the top of your Recurring component, after the useState declarations:
@@ -220,6 +260,53 @@ const handleDeleteRecurring = (rt: RecurringTransaction) => {
 
   return (
     <div className="space-y-6">
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all duration-300 scale-100 animate-fadeIn">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-green-100 dark:bg-green-900/30">
+                  <Check className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Processing Complete</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Recurring transactions processed</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="my-4">
+              <p className="text-gray-700 dark:text-gray-300 text-center">{successMessage}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-2">
+                Check your account balances and transaction history for updates.
+              </p>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              >
+                View Transactions
+              </button>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
@@ -229,10 +316,24 @@ const handleDeleteRecurring = (rt: RecurringTransaction) => {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={handleProcessNow}
-            className="bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 text-sm sm:text-base"
+            disabled={isProcessing || pendingCount === 0}
+            className={`px-4 py-2 rounded-lg flex items-center justify-center space-x-2 text-sm sm:text-base ${
+              isProcessing 
+                ? 'bg-blue-600 cursor-wait' 
+                : 'bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white'
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            <RefreshCw size={20} />
-            <span>Process Now</span>
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Processing...</span>
+              </>
+            ) : (
+              <>
+                <RefreshCw size={20} />
+                <span>Process Now</span>
+              </>
+            )}
           </button>
           <button
             onClick={() => setShowForm(true)}
@@ -245,7 +346,7 @@ const handleDeleteRecurring = (rt: RecurringTransaction) => {
       </div>
 
       {/* Pending Transactions Notification */}
-      {pendingCount > 0 && (
+      {pendingCount > 0 && !isProcessing && (
         <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <div className="flex items-center mb-3 sm:mb-0">
@@ -265,9 +366,21 @@ const handleDeleteRecurring = (rt: RecurringTransaction) => {
             </div>
             <button
               onClick={handleProcessNow}
-              className="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
+              disabled={isProcessing}
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                isProcessing
+                  ? 'bg-blue-600 cursor-wait'
+                  : 'bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white'
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              Process Now
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
+                  Processing...
+                </>
+              ) : (
+                'Process Now'
+              )}
             </button>
           </div>
         </div>

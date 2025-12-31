@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-do
 import { useState, useEffect } from 'react'; // Added useEffect
 import './App.css';
 import Dashboard from './pages/Dashboard';
-import Reports from './pages/Reports';
 import Budgets from './pages/Budgets';
 import Recurring from './pages/Recurring';
 import History from './pages/History';
@@ -36,7 +35,6 @@ function App() {
   const navigationItems = [
     { path: '/', label: 'Dashboard' },
     { path: '/accounts', label: 'Accounts' },
-    { path: '/reports', label: 'Reports' },
     { path: '/budgets', label: 'Budgets' },
     { path: '/recurring', label: 'Recurring' },
     { path: '/history', label: 'History' },
@@ -124,7 +122,6 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/accounts" element={<Accounts />} />
-            <Route path="/reports" element={<Reports />} />
             <Route path="/budgets" element={<Budgets />} />
             <Route path="/recurring" element={<Recurring />} />
             <Route path="/history" element={<History />} />

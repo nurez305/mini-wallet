@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStore } from '../store/useStore';
 import DashboardSummary from '../components/DashboardSummary';
+import Reports from './Reports';
 
 export default function Dashboard() {
   const { transactions, accounts } = useStore();
@@ -148,7 +149,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
+      <Reports />
       {/* Main Content */}
       {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">

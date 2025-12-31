@@ -343,7 +343,7 @@ export default function Accounts() {
         <div className="lg:col-span-2 space-y-6">
           {/* Account Overview */}
           {activeTab === 'overview' && selectedAccount && (
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
               <h2 className="text-lg font-semibold mb-4 dark:text-white">{selectedAccount.name} Overview</h2>
               
               {/* Balance Card */}
