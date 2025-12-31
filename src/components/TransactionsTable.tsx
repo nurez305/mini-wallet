@@ -169,50 +169,47 @@ export default function TransactionsTable() {
         </div>
       </div>
 
-      {/* Mobile Transaction Cards */}
-      <div className="md:hidden space-y-3">
-        {filtered.slice(0, 10).map((t) => {
-          const account = accounts.find(a => a.id === t.accountId);
-          return (
-            <div key={t.id} className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-4 shadow-sm">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{t.merchant}</h3>
-                    <Amount n={t.amount} />
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    {account?.name} • {dayjs(t.date).format("MMM D")}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-full">
-                      {t.category}
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Balance: <Balance balance={t.runningBalance} />
-                    </span>
+      {/* Mobile Transaction Cards - Fixed height with scroll */}
+      <div className="md:hidden">
+        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+          {filtered.map((t) => {
+            const account = accounts.find(a => a.id === t.accountId);
+            return (
+              <div key={t.id} className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-4 shadow-sm">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{t.merchant}</h3>
+                      <Amount n={t.amount} />
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      {account?.name} • {dayjs(t.date).format("MMM D, YYYY")}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-full">
+                        {t.category}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Balance: <Balance balance={t.runningBalance} />
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
+            );
+          })}
+          {filtered.length === 0 && (
+            <div className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-8 text-center">
+              <p className="text-gray-500 dark:text-gray-400">No transactions found</p>
             </div>
-          );
-        })}
-        {filtered.length === 0 && (
-          <div className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-8 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No transactions found</p>
-          </div>
-        )}
-        {filtered.length > 10 && (
-          <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">
-            Showing 10 of {filtered.length} transactions
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Desktop Table - Hidden on mobile */}
       <div className="hidden md:block bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <div className="min-h-50 max-h-100 overflow-y-auto">
+          <div className="min-h-[300px] max-h-[500px] overflow-y-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0">
                 <tr>
@@ -257,7 +254,7 @@ export default function TransactionsTable() {
 
       {/* Transaction count summary */}
       <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
-        Showing {Math.min(filtered.length, 10)} of {filtered.length} transaction{filtered.length !== 1 ? 's' : ''}
+        Showing {filtered.length} transaction{filtered.length !== 1 ? 's' : ''}
       </div>
     </div>
   );
