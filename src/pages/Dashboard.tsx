@@ -1,57 +1,56 @@
-import React from 'react';
-import { useStore } from '../store/useStore';
+// import { useStore } from '../store/useStore';
 import DashboardSummary from '../components/DashboardSummary';
 import Reports from './Reports';
 
 export default function Dashboard() {
-  const { transactions, accounts } = useStore();
+  // const { transactions, accounts } = useStore();
   
-  const stats = React.useMemo(() => {
-    // Calculate income for ALL accounts
-    const totalIncome = transactions
-      .filter(t => t.amount > 0)
-      .reduce((sum, t) => sum + t.amount, 0);
+  // const stats = React.useMemo(() => {
+  //   // Calculate income for ALL accounts
+  //   const totalIncome = transactions
+  //     .filter(t => t.amount > 0)
+  //     .reduce((sum, t) => sum + t.amount, 0);
     
-    // Calculate expenses for ALL accounts
-    const totalExpenses = Math.abs(
-      transactions
-        .filter(t => t.amount < 0)
-        .reduce((sum, t) => sum + t.amount, 0)
-    );
+  //   // Calculate expenses for ALL accounts
+  //   const totalExpenses = Math.abs(
+  //     transactions
+  //       .filter(t => t.amount < 0)
+  //       .reduce((sum, t) => sum + t.amount, 0)
+  //   );
     
-    // Calculate net flow for ALL accounts
-    const netFlow = totalIncome - totalExpenses;
-    const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+  //   // Calculate net flow for ALL accounts
+  //   const netFlow = totalIncome - totalExpenses;
+  //   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
     
-    // Calculate per-account stats
-    const accountStats = accounts.map(account => {
-      const accountTransactions = transactions.filter(t => t.accountId === account.id);
-      const accountIncome = accountTransactions
-        .filter(t => t.amount > 0)
-        .reduce((sum, t) => sum + t.amount, 0);
-      const accountExpenses = Math.abs(
-        accountTransactions
-          .filter(t => t.amount < 0)
-          .reduce((sum, t) => sum + t.amount, 0)
-      );
-      const accountNetFlow = accountIncome - accountExpenses;
+  //   // Calculate per-account stats
+  //   const accountStats = accounts.map(account => {
+  //     const accountTransactions = transactions.filter(t => t.accountId === account.id);
+  //     const accountIncome = accountTransactions
+  //       .filter(t => t.amount > 0)
+  //       .reduce((sum, t) => sum + t.amount, 0);
+  //     const accountExpenses = Math.abs(
+  //       accountTransactions
+  //         .filter(t => t.amount < 0)
+  //         .reduce((sum, t) => sum + t.amount, 0)
+  //     );
+  //     const accountNetFlow = accountIncome - accountExpenses;
       
-      return {
-        ...account,
-        income: accountIncome,
-        expenses: accountExpenses,
-        netFlow: accountNetFlow
-      };
-    });
+  //     return {
+  //       ...account,
+  //       income: accountIncome,
+  //       expenses: accountExpenses,
+  //       netFlow: accountNetFlow
+  //     };
+  //   });
     
-    return { 
-      totalIncome, 
-      totalExpenses, 
-      netFlow, 
-      totalBalance,
-      accountStats 
-    };
-  }, [transactions, accounts]);
+  //   return { 
+  //     totalIncome, 
+  //     totalExpenses, 
+  //     netFlow, 
+  //     totalBalance,
+  //     accountStats 
+  //   };
+  // }, [transactions, accounts]);
 
   return (
     <div className="space-y-6">
